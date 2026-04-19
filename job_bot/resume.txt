@@ -1,0 +1,88 @@
+ADITYA PRAKASH
+Pune, India | +91 7052921027 | aditya.prakash@adypu.edu.in | linkedin.com/in/aditya-prakash-55b7b5183 | github.com/Aditya-Prakash14
+
+
+PROFESSIONAL SUMMARY
+Full-Stack Developer and Cybersecurity Researcher with hands-on experience in MERN stack, AI-powered systems, and open-source contributions (AsyncAPI, OWASP). Built scalable projects including encrypted chat apps, server monitoring tools, and full-stack platforms. Passionate about building secure, high-performance, and user-centric applications.
+
+
+EDUCATION
+B.Tech in Artificial Intelligence & Machine Learning
+Newton School of Technology, ADYPU, Pune
+2024 – 2028 | GPA: 6.2/10
+
+Class XII (Intermediate)
+National Institute of Open Schooling
+2022 – 2024 | 78%
+
+Class X (Matriculation)
+B.N.S English School
+2018 – 2020 | 82%
+
+
+SKILLS
+Languages: JavaScript, TypeScript, Python, SQL, HTML, CSS  
+Frameworks: React, Node.js, Express.js, Next.js, Django, React Native  
+Tools & Technologies: MongoDB, MySQL, PostgreSQL, Supabase, Firebase, Prisma  
+DevOps: Docker, Docker Compose, Kubernetes, Nginx, GitHub Actions, AWS  
+Libraries/Other: OpenCV, Pandas, NumPy, Tailwind CSS, Bootstrap  
+Cybersecurity: Penetration Testing, Bug Bounty, API Testing  
+Other: Git, Bash, Postman, LangChain, LangGraph, Hugging Face, Playwright  
+
+
+EXPERIENCE
+Full Stack Developer Intern
+Zenith Technologies, Pune
+July 2025 – August 2025
+• Developed ERP portal using MERN stack  
+• Built REST APIs and integrated MongoDB database  
+• Designed responsive UI using React and Vite  
+• Collaborated on feature development and debugging  
+
+Full Stack Developer Intern
+OneHash.ai (Remote)
+June 2025 – July 2025
+• Worked on AI-powered CRM features  
+• Contributed to frontend and backend systems  
+• Built scalable and efficient full-stack solutions  
+
+
+PROJECTS
+ChatlockUP
+• Encrypted chat application using React and Node.js  
+• Implemented X25519 key exchange and XSalsa20 encryption  
+• Ensured end-to-end encryption (zero plaintext storage)  
+GitHub: https://github.com/Aditya-Prakash14/ChatlockUP  
+Live: https://chatlock-up-miul.vercel.app/
+
+WatchX – Server Monitoring Tool
+• Real-time monitoring dashboard using WebSockets  
+• Multi-server support with alerting system  
+• Built with Node.js, React, SQLite  
+GitHub: https://github.com/Aditya-Prakash14/WatchX  
+Live: https://watch-x-rho.vercel.app/
+
+PrimeEagle
+• Corporate branding and uniform solutions platform  
+• End-to-end service from design to delivery  
+Website: https://primeeagle.in/  
+GitHub: https://github.com/Aditya-Prakash14/primeEagle  
+
+
+CERTIFICATIONS
+Full-Stack Web3 Development – Cyfrin (2026)  
+Offensive Pentesting – TryHackMe (2021)  
+
+
+LEADERSHIP & ACTIVITIES
+• Founder – ISoC (Indian Summer of Code)  
+• Co-Founder & CTO – REstart (AI-based NSAT prep platform)  
+• Core Member – SETU (rural tech initiative)  
+• Core Member – Cybersecurity Club, NST ADYPU  
+• Bug Bounty Hunter – Top 3% on TryHackMe  
+
+
+ADDITIONAL INFORMATION
+• Strong interest in AI, cybersecurity, and open-source  
+• Experience in building scalable full-stack applications  
+• Active contributor to developer communities  
