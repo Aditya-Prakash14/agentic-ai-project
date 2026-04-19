@@ -48,6 +48,21 @@ class ConfigResponse(BaseModel):
     enable_apply: bool
     auto_apply: bool
 
+class LLMProvider(BaseModel):
+    name: str
+    display_name: str
+    env_var: str
+    requires_key: bool
+
+class LLMConfigResponse(BaseModel):
+    active_provider: str
+    available_providers: List[dict]
+    configured_providers: List[str]
+
+class SetLLMProviderRequest(BaseModel):
+    provider: str
+    api_key: Optional[str] = None
+
 class SearchProgress(BaseModel):
     is_running: bool
     progress: int
@@ -71,6 +86,80 @@ def load_config():
         "enable_apply": os.getenv("ENABLE_APPLY", "false").lower() == "true",
         "auto_apply": os.getenv("AUTO_APPLY", "false").lower() == "true"
     }
+
+def get_available_llm_providers() -> dict:
+    """Return available LLM providers and their configurations"""
+    return {
+        "openai": {
+            "name": "openai",
+            "display_name": "OpenAI (GPT-4/3.5)",
+            "env_var": "OPENAI_API_KEY",
+            "requires_key": True,
+            "installed": _is_package_installed("openai")
+        },
+        "anthropic": {
+            "name": "anthropic",
+            "display_name": "Anthropic Claude",
+            "env_var": "ANTHROPIC_API_KEY",
+            "requires_key": True,
+            "installed": _is_package_installed("anthropic")
+        },
+        "google": {
+            "name": "google",
+            "display_name": "Google Gemini",
+            "env_var": "GOOGLE_API_KEY",
+            "requires_key": True,
+            "installed": _is_package_installed("google-generativeai")
+        },
+        "groq": {
+            "name": "groq",
+            "display_name": "Groq (Fast & Cheap)",
+            "env_var": "GROQ_API_KEY",
+            "requires_key": True,
+            "installed": _is_package_installed("groq")
+        },
+        "openrouter": {
+            "name": "openrouter",
+            "display_name": "OpenRouter",
+            "env_var": "OPENROUTER_API_KEY",
+            "requires_key": True,
+            "installed": True  # Uses requests, always available
+        },
+        "ollama": {
+            "name": "ollama",
+            "display_name": "Local Ollama",
+            "env_var": None,
+            "requires_key": False,
+            "installed": True
+        }
+    }
+
+def _is_package_installed(package_name: str) -> bool:
+    """Check if a package is installed"""
+    try:
+        __import__(package_name.replace("-", "_"))
+        return True
+    except ImportError:
+        return False
+
+def get_active_llm_provider() -> str:
+    """Get the currently active LLM provider from environment"""
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    # Check priority order
+    if os.getenv("OPENAI_API_KEY"):
+        return "openai"
+    elif os.getenv("ANTHROPIC_API_KEY"):
+        return "anthropic"
+    elif os.getenv("GOOGLE_API_KEY"):
+        return "google"
+    elif os.getenv("GROQ_API_KEY"):
+        return "groq"
+    elif os.getenv("OPENROUTER_API_KEY"):
+        return "openrouter"
+    else:
+        return "ollama"  # Default to local Ollama
 
 def get_tracker():
     return Tracker("tracker.json")
@@ -226,6 +315,111 @@ async def reset_tracker():
     tracker = get_tracker()
     tracker.reset()
     return {"message": "Tracker reset"}
+
+@app.get("/api/llm/config", response_model=LLMConfigResponse)
+async def get_llm_config():
+    """Get available LLM providers and active provider"""
+    all_providers = get_available_llm_providers()
+    active = get_active_llm_provider()
+    
+    configured = []
+    for provider_name, provider_info in all_providers.items():
+        if provider_info.get("env_var") and os.getenv(provider_info["env_var"]):
+            configured.append(provider_name)
+    
+    return {
+        "active_provider": active,
+        "available_providers": [
+            {
+                "name": name,
+                "display_name": info["display_name"],
+                "requires_key": info["requires_key"],
+                "installed": info["installed"]
+            }
+            for name, info in all_providers.items()
+        ],
+        "configured_providers": configured
+    }
+
+@app.post("/api/llm/set-provider")
+async def set_llm_provider(request: SetLLMProviderRequest):
+    """Set the active LLM provider"""
+    from dotenv import load_dotenv
+    
+    all_providers = get_available_llm_providers()
+    
+    if request.provider not in all_providers:
+        raise HTTPException(status_code=400, detail=f"Unknown provider: {request.provider}")
+    
+    provider_info = all_providers[request.provider]
+    
+    # Check if provider is installed
+    if not provider_info["installed"]:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Provider '{request.provider}' is not installed. Run: pip install {request.provider}"
+        )
+    
+    # Handle API key
+    if provider_info["requires_key"]:
+        if not request.api_key:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Provider '{request.provider}' requires an API key"
+            )
+        
+        # Update .env file
+        env_var = provider_info["env_var"]
+        _update_env_var(env_var, request.api_key)
+        
+        # Clear other provider keys
+        for name, info in all_providers.items():
+            if name != request.provider and info.get("env_var"):
+                _update_env_var(info["env_var"], "")
+    else:
+        # Ollama - just clear other keys
+        for name, info in all_providers.items():
+            if name != "ollama" and info.get("env_var"):
+                _update_env_var(info["env_var"], "")
+    
+    # Reload environment
+    load_dotenv()
+    
+    return {
+        "message": f"LLM provider set to {request.provider}",
+        "provider": request.provider,
+        "active_provider": get_active_llm_provider()
+    }
+
+def _update_env_var(var_name: str, value: str):
+    """Update a variable in .env file"""
+    env_file = ".env"
+    
+    # Read current .env
+    lines = []
+    var_found = False
+    
+    if os.path.exists(env_file):
+        with open(env_file, "r") as f:
+            lines = f.readlines()
+    
+    # Update or add the variable
+    new_lines = []
+    for line in lines:
+        if line.startswith(f"{var_name}="):
+            var_found = True
+            if value:
+                new_lines.append(f"{var_name}={value}\n")
+            # Skip line if value is empty (remove it)
+        else:
+            new_lines.append(line)
+    
+    if not var_found and value:
+        new_lines.append(f"{var_name}={value}\n")
+    
+    # Write back
+    with open(env_file, "w") as f:
+        f.writelines(new_lines)
 
 if __name__ == "__main__":
     import uvicorn

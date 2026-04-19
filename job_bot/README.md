@@ -5,12 +5,103 @@ An AI-powered job search, scoring, and cover letter pipeline that automates the 
 ## Features
 
 ✅ **Automated Job Search** — Search multiple job boards with custom queries  
-✅ **AI Fit Scoring** — Claude rates each job 0-100 based on your resume  
+✅ **AI Fit Scoring** — AI rates each job 0-100 based on your resume  
 ✅ **Smart Filtering** — Only draft cover letters for high-fit roles (≥65 by default)  
 ✅ **Cover Letter Generation** — Tailored 3-paragraph letters in seconds  
 ✅ **No Duplicates** — Tracker prevents reprocessing on subsequent runs  
 ✅ **Beautiful Dashboard** — Browse results with sortable fit scores  
 ✅ **Optional Submission** — Playwright automation for Easy Apply (disabled by default)  
+✅ **🆕 Multi-LLM Support** — Groq, OpenAI, Claude, Gemini, OpenRouter, or local Ollama  
+✅ **🆕 Web Interface** — Full React dashboard with real-time search progress  
+✅ **🆕 Settings UI** — Configure LLM providers without restarting  
+
+## 🆕 Multi-LLM Provider Support
+
+Job Bot now supports **6 different LLM providers** with seamless switching:
+
+### Quick Setup (Choose One)
+
+#### 1️⃣ **Groq** (Recommended - 2 min setup)
+- ⚡ **Fastest** inference (50-100ms)
+- 💰 **Cheapest** ($0-10/month)
+- 🎯 Excellent quality
+- ✅ Free API key: https://console.groq.com
+
+```bash
+# Add to .env
+GROQ_API_KEY=your_api_key
+```
+
+#### 2️⃣ **Ollama** (Free - Local Privacy)
+- 🆓 **Completely free**, runs locally
+- 🔒 **100% privacy**, no internet needed
+- 📱 Works offline
+- ✅ Download: https://ollama.ai
+
+```bash
+# No setup needed, just run:
+ollama serve
+ollama pull llama2
+```
+
+#### 3️⃣ **OpenAI** (Best Quality)
+- ⭐ **Best quality** (GPT-4 available)
+- 💪 Most capable model
+- 💰 Moderate cost
+- ✅ API key: https://platform.openai.com/api-keys
+
+#### 4️⃣ **Claude** (Anthropic)
+- ⭐ **Excellent quality** and reasoning
+- 💰 Moderate cost
+- ✅ API key: https://console.anthropic.com
+
+#### 5️⃣ **Gemini** (Google)
+- ⭐ **Good quality**, free tier available
+- 💰 Cheap
+- ✅ API key: https://makersuite.google.com/app/apikeys
+
+#### 6️⃣ **OpenRouter** (Model Flexibility)
+- 🔄 Access multiple models through one API
+- 💰 Variable pricing
+- ✅ API key: https://openrouter.ai
+
+### Switch Providers Anytime
+
+**No restart required!** Change providers through the web UI:
+
+1. Open **Settings** → **LLM Provider Configuration**
+2. Select your preferred provider
+3. Enter API key (if needed)
+4. Click **Set Provider**
+
+All future searches will use the new provider immediately!
+
+**See [LLM_PROVIDERS.md](LLM_PROVIDERS.md) for complete setup guide and [LLM_QUICK_REFERENCE.md](LLM_QUICK_REFERENCE.md) for quick start.**
+
+---
+
+## 🆕 Web Interface
+
+### New React Dashboard
+
+Beautiful, responsive web interface for managing your job search:
+
+- **Dashboard** — View all jobs, fit scores, and statistics
+- **Search** — New searches with real-time progress tracking
+- **Job Detail** — Full analysis, cover letter, and application tracking
+- **Settings** — Configure LLM providers and job search parameters
+
+Start the interface:
+
+```bash
+# Terminal 1: Backend
+python -m uvicorn backend.app:app --reload
+
+# Terminal 2: Frontend
+cd frontend && npm run dev
+
+# Open http://localhost:5173
+```
 
 ---
 
@@ -75,94 +166,150 @@ git clone <repo>
 cd job_bot
 pip install -r requirements.txt
 
+# Install frontend dependencies
+cd frontend && npm install && cd ..
+
 # If you want to use Stage 4 (automated applications), install Playwright browsers:
 playwright install
 ```
 
-### 2. Set Up Ollama
+### 2. Choose Your LLM Provider
 
-- Install Ollama: https://ollama.ai
-- Pull a model: `ollama pull mistral` (or `ollama pull neural-chat`, `ollama pull orca-mini`, etc.)
-- Start Ollama server: `ollama serve` (runs on http://localhost:11434 by default)
+**Easiest**: Ollama (free, local)
+```bash
+# Install from https://ollama.ai
+ollama serve
+ollama pull llama2  # or mistral, neural-chat
+```
 
-### 3. Get API Keys
+**Fastest**: Groq (recommended for production)
+```bash
+# Get free key: https://console.groq.com/keys
+# Add to .env:
+GROQ_API_KEY=your_api_key
+```
 
-- **Serper**: https://google.serper.dev (Google Search API)
+**Best Quality**: OpenAI GPT-4
+```bash
+# Get API key: https://platform.openai.com/api-keys
+OPENAI_API_KEY=sk-...
+```
 
-### 4. Configure `.env`
+See [LLM_PROVIDERS.md](LLM_PROVIDERS.md) for all options.
+
+### 3. Configure `.env`
 
 ```bash
 cp .env.example .env
-# Edit .env and add your Serper API key and Ollama settings
 nano .env
+
+# Add ONE of:
+# GROQ_API_KEY=...          (recommended)
+# OPENAI_API_KEY=sk-...
+# ANTHROPIC_API_KEY=sk-ant-...
+# GOOGLE_API_KEY=...
+# OPENROUTER_API_KEY=...
+# (or leave all blank to use Ollama)
+
+# Configure search
+FIT_SCORE_THRESHOLD=65
+MAX_RESULTS_PER_QUERY=5
 ```
 
-**Key settings:**
-- `SERPER_API_KEY` — Your Serper API key
-- `OLLAMA_BASE_URL` — Ollama server URL (default: http://localhost:11434)
-- `OLLAMA_MODEL` — Model to use (default: mistral)
-- `FIT_SCORE_THRESHOLD` — Minimum fit score to draft cover letters (default: 65)
-- `MAX_RESULTS_PER_QUERY` — Jobs per search (default: 5)
-
-### 5. Add Your Resume
-
-Edit `resume.txt` with your actual resume in plain text.
-
-### 6. Add Search Queries
-
-Edit `queries.txt` with one search query per line:
-
-```
-software engineer internship 2025 site:linkedin.com
-backend engineer new grad site:greenhouse.io
-full stack developer internship site:lever.co
-```
-
-## Usage
-
-### Run Pipeline
+### 4. Add Your Resume
 
 ```bash
+# Edit resume.txt with your actual resume
+nano resume.txt
+```
+
+### 5. Start Services
+
+**Terminal 1 - Backend API:**
+```bash
+source venv/bin/activate  # if using venv
+python -m uvicorn backend.app:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm run dev
+# Opens http://localhost:5173
+```
+
+**Terminal 3 - Ollama (if using Ollama):**
+```bash
+ollama serve
+```
+
+### 6. Access the Application
+
+- **Web Dashboard**: http://localhost:5173
+- **API Documentation**: http://localhost:8000/docs
+
+---
+
+## Old CLI Usage (Still Available)
+
+For direct CLI pipeline (without web interface):
+
+```bash
+# 1. Add search queries to queries.txt (one per line)
+# 2. Run pipeline
 python main.py
-```
 
-This will:
-1. Search for jobs matching each query in `queries.txt`
-2. Score each job against your resume
-3. Draft cover letters for high-fit matches (fit_score ≥ 65)
-4. Generate `dashboard.html`
-
-### View Results
-
-```bash
+# 3. View results
 open dashboard.html  # macOS
-xdg-open dashboard.html  # Linux
-start dashboard.html  # Windows
 ```
 
-### Track Progress
-
-Check `tracker.json` to see all processed URLs and their scores.
+But we recommend using the **web interface** for better experience!
 
 ## Configuration
 
-Edit `.env` to customize:
+### LLM Provider (.env)
+
+Choose ONE provider:
 
 ```ini
-OLLAMA_BASE_URL=http://localhost:11434  # Your Ollama server
-OLLAMA_MODEL=mistral                    # Model to use (mistral, neural-chat, orca-mini, etc.)
-FIT_SCORE_THRESHOLD=65                  # Minimum score to draft cover letter
-MAX_RESULTS_PER_QUERY=5                 # Jobs per search query
-ENABLE_APPLY=false                      # Enable Stage 4 (automated applications) — DISABLED by default
-AUTO_APPLY=false                        # If ENABLE_APPLY=true, auto-submit without confirmation
+# Option 1: Groq (RECOMMENDED)
+GROQ_API_KEY=gsk_...
+
+# Option 2: OpenAI
+OPENAI_API_KEY=sk-...
+
+# Option 3: Claude
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Option 4: Google Gemini
+GOOGLE_API_KEY=...
+
+# Option 5: OpenRouter
+OPENROUTER_API_KEY=...
+
+# Option 6: Ollama (default, no key needed)
+# Just ensure ollama serve is running
 ```
 
-**Available Ollama models:**
-- `mistral` — Fast, good quality (recommended)
-- `neural-chat` — Optimized for conversations
-- `orca-mini` — Lightweight, runs on low-end hardware
-- `zephyr` — Fast and accurate
-- See more: https://ollama.ai/library
+### Job Search Settings
+
+```ini
+FIT_SCORE_THRESHOLD=65          # Minimum score to draft cover letter
+MAX_RESULTS_PER_QUERY=5         # Jobs per search query
+```
+
+### Application Settings (Advanced)
+
+```ini
+ENABLE_APPLY=false              # Enable Stage 4 (automated applications)
+AUTO_APPLY=false                # Auto-submit without confirmation
+```
+
+**See [LLM_PROVIDERS.md](LLM_PROVIDERS.md) for detailed configuration guide.**
+
+### Change Provider at Runtime
+
+Use the **Settings** page in the web UI to switch LLM providers without restarting!
 
 ## File Structure
 
@@ -199,14 +346,45 @@ Each file contains:
 
 ## Cost
 
-**With Ollama: FREE!** 🎉
+### Free Options 🆓
 
-Ollama runs locally on your machine, so there are no API costs:
-- Fit scoring: $0.00
-- Cover letter generation: $0.00
-- Total per job: $0.00
+**Ollama**: Completely free
+- Runs locally on your machine
+- No API costs, no rate limits
+- **50-job run**: $0.00 (just electricity!)
 
-**50-job overnight run**: $0.00 (just your electricity costs!)
+### Cheap Options 💰
+
+**Groq**: ~$0-10/month
+- Free tier available
+- Great performance
+- **Recommended for production**
+
+**Google Gemini**: Cheap
+- Free tier with generous limits
+- Low cost after free tier
+
+### Premium Options 💰💰💰
+
+**OpenAI**: $5-50+/month
+- Best quality (GPT-4)
+- $0.001-0.03 per request
+
+**Claude**: $5-50+/month
+- Excellent quality and reasoning
+- $0.003-0.02 per request
+
+## Cost Comparison
+
+| Provider | Free? | Cost/Month | Speed | Quality |
+|----------|-------|-----------|-------|---------|
+| Ollama | ✅ Yes | $0 | Medium | Good |
+| Groq | ✅ Tier | $0-10 | Very Fast | Good |
+| Gemini | ✅ Tier | $0-5 | Fast | Good |
+| Claude | ❌ | $10+ | Fast | Excellent |
+| OpenAI | ❌ | $10+ | Fast | Excellent |
+
+**Pro Tip**: Start with free Ollama, switch to Groq when ready for production! ⚡
 
 ## Rate Limiting
 

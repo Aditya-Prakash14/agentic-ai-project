@@ -21,6 +21,10 @@ export const jobBotApi = {
   deleteResult: (jobId) => api.delete(`/results/${jobId}`),
   getStats: () => api.get('/stats'),
   resetTracker: () => api.post('/reset'),
+  
+  // LLM Provider Management
+  getLlmConfig: () => api.get('/llm/config'),
+  setLlmProvider: (payload) => api.post('/llm/set-provider', payload),
 };
 
 export default api;

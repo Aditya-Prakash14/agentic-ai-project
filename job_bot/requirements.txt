@@ -8,5 +8,19 @@ uvicorn>=0.27.0
 pydantic>=2.6.0
 python-multipart>=0.0.6
 
-# LLM Integration (optional - for Ollama)
-ollama==0.1.0
+# LLM Providers (optional - choose at least ONE):
+# Option 1: OpenAI (recommended for free tier)
+openai>=1.0.0
+
+# Option 2: Anthropic Claude
+anthropic>=0.7.0
+
+# Option 3: Google Gemini
+google-generativeai>=0.3.0
+
+# Option 4: Groq (fast & cheap) ⭐ RECOMMENDED
+groq>=0.4.1
+
+# Option 5: OpenRouter (requests compatible - no extra pip needed)
+
+# Option 6: Local Ollama (no pip needed, just run: ollama serve)
